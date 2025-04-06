@@ -1,6 +1,7 @@
 import bcryptjs from "bcryptjs";
 
 import User from "../models/user.model.js";
+import cloudinary from "../libs/cloudinary.js";
 import { generateToken } from "../libs/utils.js";
 
 export const signup = async (req, res, next) => {
@@ -117,6 +118,47 @@ export const logout = (req, res, next) => {
     };
     res.status(200).json(resp);
     return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateProfile = async (req, res, next) => {
+  const { profilePic, fullName } = req.body;
+  try {
+    const userId = req.user._id;
+    if (!profilePic && !fullName) {
+      const resp = {
+        status: "error",
+        message: "At least one field is required",
+      };
+      res.status(400).json(resp);
+      return;
+    }
+    const updateData = {};
+    if (profilePic) {
+      const uploadResponse = await cloudinary.uploader.upload(profilePic);
+      updateData.profilePic = uploadResponse.secure_url;
+    }
+    if (fullName) {
+      updateData.fullName = fullName;
+    }
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    });
+    if (!updatedUser) {
+      const resp = {
+        status: "error",
+        message: "No user found",
+      };
+      res.status(404).json(resp);
+      return;
+    }
+    const resp = {
+      status: "success",
+      message: "User updated",
+    };
+    res.status(200).json(resp);
   } catch (error) {
     next(error);
   }
