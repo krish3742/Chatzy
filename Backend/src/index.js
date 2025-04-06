@@ -1,13 +1,28 @@
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
+import createHttpError from "http-errors";
 
 import authRoutes from "./routes/auth.route.js";
 
 const app = express();
 dotenv.config();
+app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+
+app.get("/", (req, res, next) => {
+  res.send("Welcome");
+});
+
+app.use((req, res, next) => {
+  next(createHttpError.NotFound());
+});
+
+app.use((error, req, res, next) => {
+  error.status = error.status || 500;
+  res.status(error.status).json(error.message);
+});
 
 const PORT = process.env.PORT || 3000;
 const connectionString = process.env.MONGODB_URI;
