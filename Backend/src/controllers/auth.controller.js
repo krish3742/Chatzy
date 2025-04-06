@@ -84,10 +84,11 @@ export const login = async (req, res, next) => {
       );
       if (checkPassword) {
         generateToken(checkUserExists._id, res);
+        const { password, ...userWithoutPassword } = checkUserExists._doc;
         const resp = {
           status: "success",
           message: "Login successful",
-          data: checkUserExists,
+          data: userWithoutPassword,
         };
         res.status(200).json(resp);
         return;
