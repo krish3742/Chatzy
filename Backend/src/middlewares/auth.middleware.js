@@ -33,7 +33,6 @@ export const verifyToken = async (req, res, next) => {
       return;
     }
     req.user = user;
-    console.log(user);
     next();
   } catch (error) {
     next(error);
