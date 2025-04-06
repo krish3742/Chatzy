@@ -33,12 +33,16 @@ export const signup = async (req, res, next) => {
     }
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
-    const newUser = new User({
+    const updateData = {
       fullName,
       email,
       password: hashedPassword,
-      profilePic,
-    });
+    };
+    if (profilePic) {
+      const uploadResponse = await cloudinary.uploader.upload(profilePic);
+      updateData.profilePic = uploadResponse.secure_url;
+    }
+    const newUser = new User(updateData);
     if (newUser) {
       generateToken(newUser._id, res);
       await newUser.save();
