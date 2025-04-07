@@ -46,9 +46,11 @@ export const signup = async (req, res, next) => {
     if (newUser) {
       generateToken(newUser._id, res);
       await newUser.save();
+      const { password, ...userWithoutPassword } = newUser._doc;
       const resp = {
         status: "success",
         message: "User registered",
+        data: userWithoutPassword,
       };
       res.status(201).json(resp);
       return;
@@ -115,9 +117,7 @@ export const login = async (req, res, next) => {
 
 export const logout = (req, res, next) => {
   try {
-    res.cookie("JWT_Token", "", {
-      maxAge: 0,
-    });
+    res.clearCookie("JWT_Token");
     const resp = {
       status: "success",
       message: "Logout successful",
