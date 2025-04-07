@@ -6,25 +6,63 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
+import PublicLayout from "./layouts/PublicLayout";
+import PrivateLayout from "./layouts/PrivateLayout";
 
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
+import { Loader } from "lucide-react";
 
 const App = () => {
-  const { checkAuth, authUser } = useAuthStore();
+  const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
   console.log(authUser);
+  if (isCheckingAuth && !authUser) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader className="size-9 animate-spin" />
+      </div>
+    );
+  }
   return (
     <div>
       <Navbar />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/login"
+          element={
+            <PublicLayout>
+              <LoginPage />
+            </PublicLayout>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PublicLayout>
+              <SignUpPage />
+            </PublicLayout>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <PrivateLayout>
+              <HomePage />
+            </PrivateLayout>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateLayout>
+              <ProfilePage />
+            </PrivateLayout>
+          }
+        />
         <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </div>
   );
