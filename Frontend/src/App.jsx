@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
@@ -14,8 +14,11 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useThemeStore } from "./store/useThemeStore";
 
 const App = () => {
+  const location = useLocation();
   const { theme } = useThemeStore();
+  const scrollableRoutes = ["/profile"];
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
+  const isScrollable = scrollableRoutes.includes(location.pathname);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -36,7 +39,7 @@ const App = () => {
   return (
     <div className="h-screen flex flex-col" data-theme={theme}>
       <Navbar />
-      <div className="flex-1">
+      <div className={`flex-1 ${isScrollable ? "" : "overflow-y-auto"}`}>
         <Routes>
           <Route
             path="/login"
@@ -57,7 +60,7 @@ const App = () => {
           <Route
             path="/"
             element={
-              <PrivateLayout>
+              <PrivateLayout noScroll={true}>
                 <HomePage />
               </PrivateLayout>
             }

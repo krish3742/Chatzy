@@ -5,6 +5,7 @@ import { get, post, put } from "../services/ApiEndpoint";
 
 export const useAuthStore = create((set) => ({
   authUser: null,
+  onlineUsers: [],
   isSigningUp: false,
   isLoggingIn: false,
   isCheckingAuth: true,
