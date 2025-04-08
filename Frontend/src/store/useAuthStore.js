@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 
-import { get, post } from "../services/ApiEndpoint";
+import { get, post, put } from "../services/ApiEndpoint";
 
 export const useAuthStore = create((set) => ({
   authUser: null,
@@ -30,8 +30,9 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       if (error.status === 500) {
         toast.error("Something went wrong!");
+      } else {
+        toast.error(error.response.data.message);
       }
-      toast.error(error.response.data.message);
     } finally {
       set({ isSigningUp: false });
     }
@@ -46,8 +47,9 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       if (error.status === 500) {
         toast.error("Something went wrong!");
+      } else {
+        toast.error(error.response.data.message);
       }
-      toast.error(error.response.data.message);
     } finally {
       set({ isLoggingIn: false });
     }
@@ -60,6 +62,23 @@ export const useAuthStore = create((set) => ({
       toast.success("Logged out successfully");
     } catch (error) {
       set({ authUser: null });
+    }
+  },
+
+  updateProfile: async (data) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const response = await put("/auth/update-profile", data);
+      set({ authUser: response.data.data });
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      if (error.status === 500) {
+        toast.error("Something went wrong!");
+      } else {
+        toast.error(error.response.data.message);
+      }
+    } finally {
+      set({ isUpdatingProfile: false });
     }
   },
 }));

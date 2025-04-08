@@ -3,9 +3,6 @@ import axios from "axios";
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 export const instance = axios.create({
   baseURL: backendURL,
-  headers: {
-    "Content-Type": "application/json",
-  },
   withCredentials: true,
 });
 
