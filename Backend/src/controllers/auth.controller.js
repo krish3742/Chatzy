@@ -1,11 +1,10 @@
 import bcryptjs from "bcryptjs";
 
 import User from "../models/user.model.js";
-import cloudinary from "../libs/cloudinary.js";
 import { generateToken } from "../libs/utils.js";
 
 export const signup = async (req, res, next) => {
-  const { email, fullName, password, profilePic } = req.body;
+  const { email, fullName, password } = req.body;
   try {
     if (!fullName || !email || !password) {
       const resp = {
@@ -38,9 +37,8 @@ export const signup = async (req, res, next) => {
       email,
       password: hashedPassword,
     };
-    if (profilePic) {
-      const uploadResponse = await cloudinary.uploader.upload(profilePic);
-      updateData.profilePic = uploadResponse.secure_url;
+    if (req.file) {
+      updateData.profilePic = req.file.path;
     }
     const newUser = new User(updateData);
     if (newUser) {
@@ -130,10 +128,10 @@ export const logout = (req, res, next) => {
 };
 
 export const updateProfile = async (req, res, next) => {
-  const { profilePic, fullName } = req.body;
+  const { fullName } = req.body;
   try {
     const userId = req.user._id;
-    if (!profilePic && !fullName) {
+    if (!req.file && !fullName) {
       const resp = {
         status: "error",
         message: "At least one field is required",
@@ -142,9 +140,8 @@ export const updateProfile = async (req, res, next) => {
       return;
     }
     const updateData = {};
-    if (profilePic) {
-      const uploadResponse = await cloudinary.uploader.upload(profilePic);
-      updateData.profilePic = uploadResponse.secure_url;
+    if (req.file) {
+      updateData.profilePic = req.file.path;
     }
     if (fullName) {
       updateData.fullName = fullName;
