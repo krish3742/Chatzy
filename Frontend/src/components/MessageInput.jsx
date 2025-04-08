@@ -1,8 +1,8 @@
+import toast from "react-hot-toast";
 import { useRef, useState } from "react";
 import { Image, Send, X } from "lucide-react";
 
 import { useChatStore } from "../store/useChatStore";
-import toast from "react-hot-toast";
 
 const MessageInput = () => {
   const fileInputRef = useRef(null);

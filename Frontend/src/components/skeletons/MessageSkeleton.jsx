@@ -1,7 +1,6 @@
 import ChatHeader from "../ChatHeader";
 
 const MessageSkeleton = () => {
-  // Create an array of 6 items for skeleton messages
   const skeletonMessages = Array(5).fill(null);
 
   return (

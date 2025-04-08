@@ -2,10 +2,10 @@ import { useEffect } from "react";
 
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
+import { formatMessageTime } from "../lib/utils";
+import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
-import { useAuthStore } from "../store/useAuthStore";
-import { formatMessageTime } from "../lib/utils";
 
 const ChatContainer = () => {
   const { authUser } = useAuthStore();
