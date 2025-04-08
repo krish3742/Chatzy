@@ -44,15 +44,22 @@ export const sendMessage = async (req, res, next) => {
   try {
     const loggedInUserId = req.user._id;
     const receiverId = req.params.id;
-    const { text, image } = req.body;
+    const { text } = req.body;
+    if (!req.file && !text) {
+      const resp = {
+        status: "error",
+        message: "At least one field is required",
+      };
+      res.status(400).json(resp);
+      return;
+    }
     const updateData = {
       senderId: loggedInUserId,
       receiverId,
       text,
     };
-    if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(profilePic);
-      updateData.image = uploadResponse.secure_url;
+    if (req.file) {
+      updateData.image = req.file.path;
     }
     const newMessage = new Message(updateData);
     await newMessage.save();
