@@ -74,7 +74,7 @@ const SignUpPage = () => {
                 </div>
                 <input
                   type="text"
-                  className={`input input-bordered w-full pl-10`}
+                  className={`w-full pl-10 py-2 border border-gray-300 bg-transparent rounded focus:outline-none focus:ring-1 focus:ring-primary/50`}
                   placeholder="Kshitij Agrawal"
                   value={formData.fullName}
                   onChange={(e) =>
@@ -93,7 +93,7 @@ const SignUpPage = () => {
                 </div>
                 <input
                   type="email"
-                  className={`input input-bordered w-full pl-10`}
+                  className={`w-full pl-10 py-2 border border-gray-300 bg-transparent rounded focus:outline-none focus:ring-1 focus:ring-primary/50`}
                   placeholder="you@gmail.com"
                   value={formData.email}
                   onChange={(e) =>
@@ -112,7 +112,7 @@ const SignUpPage = () => {
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
-                  className={`input input-bordered w-full pl-10`}
+                  className={`w-full pl-10 py-2 border border-gray-300 bg-transparent rounded focus:outline-none focus:ring-1 focus:ring-primary/50`}
                   placeholder="********"
                   value={formData.password}
                   onChange={(e) =>
