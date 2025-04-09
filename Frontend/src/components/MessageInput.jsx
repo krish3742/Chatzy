@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { useRef, useState } from "react";
-import { Image, Send, X } from "lucide-react";
+import { Image, X, SendHorizontal } from "lucide-react";
 
 import { useChatStore } from "../store/useChatStore";
 
@@ -54,8 +54,8 @@ const MessageInput = () => {
     await sendMessage(formData);
 
     setText("");
-    setImageFile(null);
     setImagePreview(null);
+    setImageFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -115,7 +115,7 @@ const MessageInput = () => {
           className="btn btn-md btn-circle flex items-center justify-center"
           disabled={!text.trim() && !imagePreview}
         >
-          <Send size={22} />
+          <SendHorizontal size={22} />
         </button>
       </form>
     </div>

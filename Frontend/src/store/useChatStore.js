@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 
+import { useAuthStore } from "./useAuthStore";
 import { get as apiGet, post } from "../services/ApiEndpoint";
 
 export const useChatStore = create((set, get) => ({
@@ -57,6 +58,25 @@ export const useChatStore = create((set, get) => ({
         toast.error(error.response.data.message);
       }
     }
+  },
+
+  listenMessages: () => {
+    const { selectedUser } = get();
+    if (!selectedUser) {
+      return;
+    }
+    const socket = useAuthStore.getState().socket;
+    socket.on("newMessage", (newMessage) => {
+      if (newMessage.senderId !== selectedUser._id) {
+        return;
+      }
+      set({ messages: [...get().messages, newMessage] });
+    });
+  },
+
+  ignoreMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    socket.off("newMessage");
   },
 
   setSelectedUser: (selectedUser) => set({ selectedUser }),

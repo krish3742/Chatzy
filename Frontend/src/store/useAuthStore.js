@@ -1,9 +1,11 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
+import { io } from "socket.io-client";
 
-import { get, post, put } from "../services/ApiEndpoint";
+import { get as apiGet, post, put } from "../services/ApiEndpoint";
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
+  socket: null,
   authUser: null,
   onlineUsers: [],
   isSigningUp: false,
@@ -13,8 +15,9 @@ export const useAuthStore = create((set) => ({
 
   checkAuth: async () => {
     try {
-      const response = await get("/auth/check");
+      const response = await apiGet("/auth/check");
       set({ authUser: response.data.data });
+      get().connectSocket();
     } catch (error) {
       set({ authUser: null });
     } finally {
@@ -28,6 +31,7 @@ export const useAuthStore = create((set) => ({
       const response = await post("/auth/signup", data);
       set({ authUser: response.data.data });
       toast.success("Account created successfully");
+      get().connectSocket();
     } catch (error) {
       if (error.status === 500) {
         toast.error("Something went wrong!");
@@ -45,6 +49,7 @@ export const useAuthStore = create((set) => ({
       const response = await post("/auth/login", data);
       set({ authUser: response.data.data });
       toast.success("Logged In successfully");
+      get().connectSocket();
     } catch (error) {
       if (error.status === 500) {
         toast.error("Something went wrong!");
@@ -58,9 +63,10 @@ export const useAuthStore = create((set) => ({
 
   logout: async () => {
     try {
-      const response = await get("/auth/logout");
+      const response = await apiGet("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully");
+      get().disconnectSocket();
     } catch (error) {
       set({ authUser: null });
     }
@@ -80,6 +86,30 @@ export const useAuthStore = create((set) => ({
       }
     } finally {
       set({ isUpdatingProfile: false });
+    }
+  },
+
+  connectSocket: () => {
+    const { authUser } = get();
+    if (!authUser || get().socket?.connected) {
+      return;
+    }
+    const socket = io(import.meta.env.VITE_BASE_URL, {
+      query: {
+        userId: authUser._id,
+      },
+    });
+    socket.connect();
+    set({ socket });
+    socket.on("getOnlineUsers", (userIds) => {
+      set({ onlineUsers: userIds });
+    });
+  },
+
+  disconnectSocket: () => {
+    if (get().socket.connected) {
+      get().socket.disconnect();
+      set({ socket: null });
     }
   },
 }));
