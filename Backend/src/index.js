@@ -5,10 +5,10 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import createHttpError from "http-errors";
 
+import { app, server } from "./libs/socket.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 
-const app = express();
 dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
@@ -37,7 +37,7 @@ const connectionString = process.env.MONGODB_URI;
 (async () => {
   try {
     await mongoose.connect(connectionString);
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server is running on PORT ${PORT}`);
     });
   } catch (error) {
