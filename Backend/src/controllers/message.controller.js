@@ -2,12 +2,24 @@ import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import { getReceiverSocketId, io } from "../libs/socket.js";
 
-export const getAllUsers = async (req, res, next) => {
+export const getUsers = async (req, res, next) => {
   try {
+    const searchedUser = req.query.search;
     const loggedInUserId = req.user._id;
-    const filteredUser = await User.find({
-      _id: { $ne: loggedInUserId },
-    }).select("-password");
+    let filteredUser;
+    if (searchedUser) {
+      filteredUser = await User.find({
+        _id: { $ne: loggedInUserId },
+        $or: [
+          { fullName: { $regex: searchedUser, $options: "i" } },
+          { email: { $regex: searchedUser, $options: "i" } },
+        ],
+      }).select("-password");
+    } else {
+      filteredUser = await User.find({
+        _id: { $ne: loggedInUserId },
+      }).select("-password");
+    }
     const resp = {
       status: "success",
       message: "All user fetched",
@@ -15,6 +27,7 @@ export const getAllUsers = async (req, res, next) => {
     };
     res.status(200).json(resp);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

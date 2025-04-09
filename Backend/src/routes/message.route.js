@@ -1,7 +1,7 @@
 import express from "express";
 
 import {
-  getAllUsers,
+  getUsers,
   getMessages,
   sendMessage,
 } from "../controllers/message.controller.js";
@@ -10,7 +10,7 @@ import { verifyToken } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/users", verifyToken, getAllUsers);
+router.get("/users", verifyToken, getUsers);
 
 router.get("/:id", verifyToken, getMessages);
 
