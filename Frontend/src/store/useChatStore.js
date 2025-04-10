@@ -6,9 +6,12 @@ import { get as apiGet, post } from "../services/ApiEndpoint";
 
 export const useChatStore = create((set, get) => ({
   users: [],
+  chats: [],
   messages: [],
   selectedChat: null,
+  isChatsLoading: false,
   isUsersLoading: false,
+  isCreatingGroup: false,
   isMessagesLoading: false,
 
   getUsers: async () => {
@@ -24,6 +27,22 @@ export const useChatStore = create((set, get) => ({
       }
     } finally {
       set({ isUsersLoading: false });
+    }
+  },
+
+  getChats: async () => {
+    set({ isChatsLoading: true });
+    try {
+      const response = await apiGet("/message");
+      set({ chats: response.data.data });
+    } catch (error) {
+      if (error.status === 500) {
+        toast.error("Something went wrong!");
+      } else {
+        toast.error(error.response.data.message);
+      }
+    } finally {
+      set({ isChatsLoading: false });
     }
   },
 
@@ -79,9 +98,10 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage");
   },
 
-  setSelectedChat: async (userId) => {
+  accessChat: async (userId) => {
     try {
       const response = await apiGet(`/message/${userId}`);
+      get().getChats();
       set({ selectedChat: response.data.data });
     } catch (error) {
       if (error.status === 500) {
@@ -89,6 +109,27 @@ export const useChatStore = create((set, get) => ({
       } else {
         toast.error(error.response.data.message);
       }
+    }
+  },
+
+  setSelectedChat: (chat) => set({ selectedChat: chat }),
+
+  createGroup: async (data) => {
+    set({ isCreatingGroup: true });
+    try {
+      const response = await post("/message/group", data);
+      get().getChats();
+      toast.success("Group created successfully");
+      set({ selectedChat: response.data.data });
+    } catch (error) {
+      if (error.status === 500) {
+        toast.error("Something went wrong!");
+      } else {
+        toast.error(error.response.data.message);
+      }
+    } finally {
+      set({ isCreatingGroup: false });
+      return true;
     }
   },
 }));

@@ -9,7 +9,7 @@ const ContactsDrawer = () => {
   const drawerRef = useRef(null);
   const { onlineUsers } = useAuthStore();
   const [search, setSearch] = useState("");
-  const { getUsers, users, isUsersLoading, setSelectedChat } = useChatStore();
+  const { getUsers, users, isUsersLoading, accessChat } = useChatStore();
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -28,12 +28,12 @@ const ContactsDrawer = () => {
 
   const handleUserClick = useCallback(
     (id) => {
-      setSelectedChat(id);
+      accessChat(id);
       if (drawerRef.current) {
         drawerRef.current.checked = false;
       }
     },
-    [setSelectedChat]
+    [accessChat]
   );
 
   useEffect(() => {
@@ -99,6 +99,10 @@ const ContactsDrawer = () => {
 
           {isUsersLoading ? (
             <DrawerSkeleton />
+          ) : filteredUser && filteredUser.length === 0 ? (
+            <div className="w-full text-center p-2">
+              <span className="font-medium">No contacts</span>
+            </div>
           ) : (
             <div className="flex-grow">
               {filteredUser.map((user) => (

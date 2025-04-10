@@ -37,9 +37,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="h-full grid lg:grid-cols-2">
+    <div className="h-full grid md:grid-cols-2">
       {/* Left Side */}
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center p-2">
         <div className="w-full max-w-md space-y-8">
           {/* LOGO */}
           <div className="text-center mb-8">

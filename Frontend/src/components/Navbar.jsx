@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-
 import { Bell, User, LogOut, ChevronDown, MessageSquare } from "lucide-react";
 
 import ContactsDrawer from "./ContactsDrawer";
@@ -99,7 +98,7 @@ const Navbar = () => {
                   </li>
                   <li>
                     <button
-                      className="flex gap-2 items-center hover:bg-base-300 rounded-sm p-1 w-full py-1.5"
+                      className="flex gap-2 items-center hover:bg-base-300 rounded-md p-1 w-full py-1.5"
                       onClick={logout}
                     >
                       <LogOut className="size-5" />
