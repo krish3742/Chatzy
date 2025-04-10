@@ -5,9 +5,9 @@ import { useAuthStore } from "./useAuthStore";
 import { get as apiGet, post } from "../services/ApiEndpoint";
 
 export const useChatStore = create((set, get) => ({
-  messages: [],
   users: [],
-  selectedUser: null,
+  messages: [],
+  selectedChat: null,
   isUsersLoading: false,
   isMessagesLoading: false,
 
@@ -79,5 +79,16 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage");
   },
 
-  setSelectedUser: (selectedUser) => set({ selectedUser }),
+  setSelectedChat: async (userId) => {
+    try {
+      const response = await apiGet(`/message/${userId}`);
+      set({ selectedChat: response.data.data });
+    } catch (error) {
+      if (error.status === 500) {
+        toast.error("Something went wrong!");
+      } else {
+        toast.error(error.response.data.message);
+      }
+    }
+  },
 }));
