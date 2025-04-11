@@ -76,7 +76,11 @@ const ChatHeader = () => {
         ref={modalRef}
       />
       <div className="modal" role="dialog">
-        <div className="modal-box max-h-[95vh] overflow-visible">
+        <div
+          className={`modal-box max-h-[95vh] ${
+            selectedChat.isGroupChat ? "overflow-visible" : ""
+          }`}
+        >
           <button
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-1"
             onClick={() => {

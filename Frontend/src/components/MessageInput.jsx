@@ -7,7 +7,7 @@ import { useChatStore } from "../store/useChatStore";
 const MessageInput = () => {
   const fileInputRef = useRef(null);
   const [text, setText] = useState("");
-  const { sendMessage } = useChatStore();
+  const { sendMessage, selectedChat } = useChatStore();
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
@@ -41,7 +41,7 @@ const MessageInput = () => {
     }
   };
 
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = (e) => {
     e.preventDefault();
 
     if (!text.trim() && !imagePreview) {
@@ -49,9 +49,10 @@ const MessageInput = () => {
     }
 
     const formData = new FormData();
+    formData.append("chatId", selectedChat._id);
     formData.append("text", text.trim());
     formData.append("image", imageFile);
-    await sendMessage(formData);
+    sendMessage(formData);
 
     setText("");
     setImagePreview(null);
@@ -85,12 +86,23 @@ const MessageInput = () => {
 
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
         <div className="flex-1 flex gap-2">
-          <input
-            type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
+          <textarea
+            rows={1}
+            className="w-full border border-gray-300 p-2 rounded-lg resize-none input-sm sm:input-md max-h-[100px]"
             placeholder="Type a message..."
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onInput={(e) => {
+              e.target.style.height = "auto";
+              const scrollHeight = Math.min(e.target.scrollHeight, 100);
+              e.target.style.height = `${scrollHeight}px`;
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage(e);
+              }
+            }}
           />
           <input
             type="file"
@@ -99,10 +111,9 @@ const MessageInput = () => {
             ref={fileInputRef}
             onChange={handleImageChange}
           />
-
           <button
             type="button"
-            className={`hidden sm:flex btn btn-circle ${
+            className={`btn btn-circle self-end ${
               imagePreview ? "text-emerald-500" : "text-zinc-400"
             }`}
             onClick={() => fileInputRef.current?.click()}
@@ -112,7 +123,7 @@ const MessageInput = () => {
         </div>
         <button
           type="submit"
-          className="btn btn-md btn-circle flex items-center justify-center"
+          className="btn btn-md self-end btn-circle flex items-center justify-center"
           disabled={!text.trim() && !imagePreview}
         >
           <SendHorizontal size={22} />

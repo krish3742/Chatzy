@@ -48,10 +48,14 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  getMessages: async (userId) => {
+  getMessages: async () => {
+    const { selectedChat } = get();
+    if (!selectedChat) {
+      return;
+    }
     set({ isMessagesLoading: true });
     try {
-      const response = await apiGet(`/message/${userId}`);
+      const response = await apiGet(`/message/get/${selectedChat._id}`);
       set({ messages: response.data.data });
     } catch (error) {
       if (error.status === 500) {
@@ -65,12 +69,9 @@ export const useChatStore = create((set, get) => ({
   },
 
   sendMessage: async (messageData) => {
-    const { selectedUser, messages } = get();
+    const { messages } = get();
     try {
-      const response = await post(
-        `/message/send/${selectedUser._id}`,
-        messageData
-      );
+      const response = await post("/message/send", messageData);
       set({ messages: [...messages, response.data.data] });
     } catch (error) {
       if (error.status === 500) {
@@ -173,6 +174,7 @@ export const useChatStore = create((set, get) => ({
     }
     try {
       const response = await put("/message/groupremove", data);
+      get().getMessages();
       if (data.userId === authUser._id) {
         set({ selectedChat: null });
         get().getChats();

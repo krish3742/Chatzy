@@ -41,6 +41,19 @@ const ProfileModal = () => {
           </p>
         </div>
       </div>
+      <div className="bg-base-200 border rounded-xl p-6">
+        <h2 className="text-lg font-medium  mb-4">Account Information</h2>
+        <div className="text-sm">
+          <div className="flex items-center justify-between py-2 border-b border-zinc-700">
+            <span>Member Since</span>
+            <span>{selectedChat.createdAt?.split("T")[0]}</span>
+          </div>
+          <div className="flex items-center justify-between py-2">
+            <span>Account Status</span>
+            <span className="text-green-500">Active</span>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

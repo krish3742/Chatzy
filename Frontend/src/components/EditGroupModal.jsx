@@ -13,13 +13,6 @@ import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 
 const EditGroupModal = ({ isModalOpen }) => {
-  const inputRef = useRef(null);
-  const { authUser } = useAuthStore();
-  const [search, setSearch] = useState("");
-  const [editName, setEditName] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const [groupName, setGroupName] = useState(selectedChat.chatName);
-  const [dropdownDirection, setDropdownDirection] = useState("down");
   const {
     users,
     selectedChat,
@@ -29,6 +22,13 @@ const EditGroupModal = ({ isModalOpen }) => {
     isGroupRenaming,
     removeUserFromGroup,
   } = useChatStore();
+  const inputRef = useRef(null);
+  const { authUser } = useAuthStore();
+  const [search, setSearch] = useState("");
+  const [editName, setEditName] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [groupName, setGroupName] = useState(selectedChat.chatName);
+  const [dropdownDirection, setDropdownDirection] = useState("down");
 
   const handleEditNameClick = () => {
     setGroupName(selectedChat.chatName);
