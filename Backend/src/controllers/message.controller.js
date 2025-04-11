@@ -1,7 +1,6 @@
+import Chat from "../models/chat.model.js";
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
-import { getReceiverSocketId, io } from "../libs/socket.js";
-import Chat from "../models/chat.model.js";
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -279,7 +278,7 @@ export const removeFromGroup = async (req, res, next) => {
     const isLoggedInUserAdmin =
       chat.groupAdmin.toString() === loggedInUserId.toString();
 
-    if (!isLoggedInUserAdmin) {
+    if (!isLoggedInUserAdmin && userId !== loggedInUserId.toString()) {
       const resp = {
         status: "error",
         message: "Only admin can remove users",
@@ -377,14 +376,10 @@ export const renameGroup = async (req, res, next) => {
 
 export const getMessages = async (req, res, next) => {
   try {
-    const userToChatId = req.params.id;
-    const loggedInUserId = req.user._id;
-    const messages = await Message.find({
-      $or: [
-        { senderId: loggedInUserId, receiverId: userToChatId },
-        { senderId: userToChatId, receiverId: loggedInUserId },
-      ],
-    });
+    const chatId = req.params.chatId;
+    const messages = await Message.find({ chat: chatId })
+      .populate("senderId", "fullName profilePic email")
+      .populate("chat");
     const resp = {
       status: "success",
       message: "All messages fetched",
@@ -399,30 +394,37 @@ export const getMessages = async (req, res, next) => {
 export const sendMessage = async (req, res, next) => {
   try {
     const loggedInUserId = req.user._id;
-    const receiverId = req.params.id;
-    const { text } = req.body;
-    if (!req.file && !text) {
+    const { text, chatId } = req.body;
+    if ((!req.file && !text) || !chatId) {
       const resp = {
         status: "error",
-        message: "At least one field is required",
+        message: "All fields are required",
       };
       res.status(400).json(resp);
       return;
     }
     const updateData = {
       senderId: loggedInUserId,
-      receiverId,
-      text,
+      chat: chatId,
     };
     if (req.file) {
       updateData.image = req.file.path;
     }
-    const newMessage = new Message(updateData);
-    await newMessage.save();
-    const receiverSocketId = getReceiverSocketId(receiverId);
-    if (receiverId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
+    if (text) {
+      updateData.text = text;
     }
+    let newMessage = new Message(updateData);
+    await newMessage.save();
+
+    newMessage = await newMessage.populate("senderId", "fullName profilePic");
+    newMessage = await newMessage.populate("chat");
+    newMessage = await User.populate(newMessage, {
+      path: "chat.users",
+      select: "fullName email profilePic",
+    });
+
+    await Chat.findByIdAndUpdate(chatId, { latestMessage: newMessage });
+
     const resp = {
       status: "success",
       message: "Message sent",

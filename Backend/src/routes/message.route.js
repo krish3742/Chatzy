@@ -8,6 +8,7 @@ import {
   sendMessage,
   createGroup,
   renameGroup,
+  getMessages,
   removeFromGroup,
 } from "../controllers/message.controller.js";
 import upload from "../middlewares/multer.middleware.js";
@@ -29,6 +30,8 @@ router.put("/groupremove", verifyToken, removeFromGroup);
 
 router.put("/groupadd", verifyToken, addToGroup);
 
-router.post("/send/:id", verifyToken, upload.single("image"), sendMessage);
+router.get("/get/:chatId", verifyToken, getMessages);
+
+router.post("/send", verifyToken, upload.single("image"), sendMessage);
 
 export default router;
