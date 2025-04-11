@@ -2,7 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 
 import { useAuthStore } from "./useAuthStore";
-import { get as apiGet, post } from "../services/ApiEndpoint";
+import { get as apiGet, post, put } from "../services/ApiEndpoint";
 
 export const useChatStore = create((set, get) => ({
   users: [],
@@ -12,6 +12,8 @@ export const useChatStore = create((set, get) => ({
   isChatsLoading: false,
   isUsersLoading: false,
   isCreatingGroup: false,
+  isGroupRenaming: false,
+  isGroupUpdating: false,
   isMessagesLoading: false,
 
   getUsers: async () => {
@@ -129,7 +131,65 @@ export const useChatStore = create((set, get) => ({
       }
     } finally {
       set({ isCreatingGroup: false });
-      return true;
+    }
+  },
+
+  updateGroupName: async (data) => {
+    set({ isGroupRenaming: true });
+    try {
+      const response = await put("/message/rename", data);
+      get().getChats();
+      set({ selectedChat: response.data.data });
+      toast.success("Group name updated successfully");
+    } catch (error) {
+      if (error.status === 500) {
+        toast.error("Something went wrong!");
+      } else {
+        toast.error(error.response.data.message);
+      }
+    } finally {
+      set({ isGroupRenaming: false });
+    }
+  },
+
+  addUserToGroup: async (data) => {
+    try {
+      const response = await put("/message/groupadd", data);
+      set({ selectedChat: response.data.data });
+      toast.success("User added successfully");
+    } catch (error) {
+      if (error.status === 500) {
+        toast.error("Something went wrong!");
+      } else {
+        toast.error(error.response.data.message);
+      }
+    }
+  },
+
+  removeUserFromGroup: async (data) => {
+    const authUser = useAuthStore.getState().authUser;
+    if (data.userId === authUser._id) {
+      set({ isGroupUpdating: true });
+    }
+    try {
+      const response = await put("/message/groupremove", data);
+      if (data.userId === authUser._id) {
+        set({ selectedChat: null });
+        get().getChats();
+      } else {
+        set({ selectedChat: response.data.data });
+      }
+      toast.success("User removed successfully");
+    } catch (error) {
+      if (error.status === 500) {
+        toast.error("Something went wrong!");
+      } else {
+        toast.error(error.response.data.message);
+      }
+    } finally {
+      if (data.userId === authUser._id) {
+        set({ isGroupUpdating: false });
+      }
     }
   },
 }));

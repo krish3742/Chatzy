@@ -19,7 +19,7 @@ const HomePage = () => {
           selectedChat ? "" : "hidden"
         }`}
       >
-        <NoChatSelected />
+        {selectedChat ? <ChatContainer /> : <NoChatSelected />}
       </div>
     </div>
   );

@@ -5,27 +5,12 @@ import NewGroupModal from "./NewGroupModal";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
+import { getUserId, getUserName, getUserProfilePic } from "../lib/utils";
 
 const Sidebar = () => {
   const { onlineUsers, authUser } = useAuthStore();
   const { getChats, chats, isChatsLoading, setSelectedChat, selectedChat } =
     useChatStore();
-
-  const getUserProfilePic = (users) => {
-    return users[0]._id === authUser._id
-      ? users[1].profilePic
-      : users[0].profilePic;
-  };
-
-  const getUserName = (users) => {
-    return users[0]._id === authUser._id
-      ? users[1].fullName
-      : users[0].fullName;
-  };
-
-  const getUserId = (users) => {
-    return users[0]._id === authUser._id ? users[1]._id : users[0]._id;
-  };
 
   useEffect(() => {
     getChats();
@@ -33,7 +18,7 @@ const Sidebar = () => {
 
   return (
     <aside className="h-full border-r border-base-300 flex flex-col transition-all duration-200">
-      <div className="border-b border-base-300 w-full flex items-center justify-between p-5">
+      <div className="border-b border-base-300 w-full flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
           <MessagesSquare className="size-6" />
           <span className="font-medium sm:hidden md:inline">Chats</span>
@@ -66,22 +51,26 @@ const Sidebar = () => {
                   src={
                     chat.isGroupChat
                       ? "/avatar.png"
-                      : getUserProfilePic(chat.users) || "/avatar.png"
+                      : getUserProfilePic(chat.users, authUser) || "/avatar.png"
                   }
                   alt={
-                    chat.isGroupChat ? chat.chatName : getUserName(chat.users)
+                    chat.isGroupChat
+                      ? chat.chatName
+                      : getUserName(chat.users, authUser)
                   }
-                  className="size-12 object-cover rounded-full"
+                  className="size-12 object-cover rounded-full border-2"
                 />
                 {!chat.isGroupChat &&
-                  onlineUsers.includes(getUserId(chat.users)) && (
+                  onlineUsers.includes(getUserId(chat.users, authUser)) && (
                     <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900" />
                   )}
               </div>
 
               <div className="text-left min-w-0">
                 <div className="font-medium truncate">
-                  {chat.isGroupChat ? chat.chatName : getUserName(chat.users)}
+                  {chat.isGroupChat
+                    ? chat.chatName
+                    : getUserName(chat.users, authUser)}
                 </div>
                 <div className="text-sm text-zinc-400">
                   {/* {onlineUsers.includes(user._id) ? "Online" : "Offline"} */}

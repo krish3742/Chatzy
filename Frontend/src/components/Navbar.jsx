@@ -18,7 +18,7 @@ const Navbar = () => {
         {/* Logo */}
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2.5 transition-all">
-            <div className="size-9 rounded-lg bg-base-200 flex items-center justify-center">
+            <div className="size-9 rounded-lg bg-base-300 flex items-center justify-center">
               <MessageSquare className="w-5 h-5 text-primary" />
             </div>
             <h1

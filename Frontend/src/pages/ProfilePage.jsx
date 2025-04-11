@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Camera, User, Mail, Pencil, X, Check } from "lucide-react";
+import { Camera, User, Mail, Pencil, X, Check, Loader2 } from "lucide-react";
 
 import { useAuthStore } from "../store/useAuthStore";
 import { useThemeStore } from "../store/useThemeStore";
@@ -41,7 +41,7 @@ const ProfilePage = () => {
   };
 
   const handleNameUpdate = async (e) => {
-    if (fullName === authUser.fullName) {
+    if (fullName === authUser.fullName || !fullName) {
       return;
     }
     await updateProfile({ fullName });
@@ -109,9 +109,17 @@ const ProfilePage = () => {
                         type="button"
                         className="h-fit p-1 rounded-sm btn btn-primary"
                         onClick={handleNameUpdate}
-                        disabled={fullName === authUser.fullName}
+                        disabled={
+                          fullName === authUser.fullName ||
+                          !fullName ||
+                          (isUpdatingProfile && editName)
+                        }
                       >
-                        <Check className="size-5 text-base-content/40" />
+                        {isUpdatingProfile ? (
+                          <Loader2 className="size-5 animate-spin" />
+                        ) : (
+                          <Check className="size-5 text-base-content/40" />
+                        )}
                       </button>
                       <button
                         type="button"

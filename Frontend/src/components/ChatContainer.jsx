@@ -19,18 +19,18 @@ const ChatContainer = () => {
     listenMessages,
   } = useChatStore();
 
-  useEffect(() => {
-    getMessages(selectedUser._id);
-    listenMessages();
+  // useEffect(() => {
+  //   getMessages(selectedUser._id);
+  //   listenMessages();
 
-    return () => ignoreMessages();
-  }, [selectedUser._id, getMessages]);
+  //   return () => ignoreMessages();
+  // }, [selectedUser._id, getMessages]);
 
-  useEffect(() => {
-    if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
+  // useEffect(() => {
+  //   if (messageEndRef.current) {
+  //     messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [messages]);
 
   if (isMessagesLoading) {
     return <MessageSkeleton />;
@@ -40,7 +40,7 @@ const ChatContainer = () => {
     <div className="flex-1 flex flex-col h-full overflow-auto">
       <ChatHeader />
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
             key={message._id}
@@ -80,7 +80,7 @@ const ChatContainer = () => {
         <div ref={messageEndRef}></div>
       </div>
 
-      <MessageInput />
+      <MessageInput /> */}
     </div>
   );
 };
