@@ -37,7 +37,10 @@ const App = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col" data-theme={theme}>
+    <div
+      className="flex flex-col h-[550px] tall:h-screen bg-base-100"
+      data-theme={theme}
+    >
       <Navbar />
       <div className={`flex-1 ${isScrollable ? "" : "overflow-y-auto"}`}>
         <Routes>

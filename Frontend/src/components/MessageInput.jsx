@@ -3,13 +3,46 @@ import { useRef, useState } from "react";
 import { Image, X, SendHorizontal } from "lucide-react";
 
 import { useChatStore } from "../store/useChatStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const MessageInput = () => {
+  const typingRef = useRef(false);
   const fileInputRef = useRef(null);
   const [text, setText] = useState("");
-  const { sendMessage, selectedChat } = useChatStore();
+  const [typing, setTyping] = useState(false);
+  const { socket, authUser } = useAuthStore();
   const [imageFile, setImageFile] = useState(null);
+  const { sendMessage, selectedChat } = useChatStore();
   const [imagePreview, setImagePreview] = useState(null);
+
+  const typingHandler = (e) => {
+    setText(e.target.value);
+
+    if (!socket) {
+      return;
+    }
+
+    if (!typing) {
+      setTyping(true);
+      typingRef.current = true;
+      socket.emit("typing", {
+        chatId: selectedChat._id,
+        user: authUser,
+      });
+    }
+
+    const lastTypingTime = new Date().getTime();
+    const timerLength = 3000;
+    setTimeout(() => {
+      const timeNow = new Date().getTime();
+      const timeDifference = timeNow - lastTypingTime;
+      if (timeDifference >= timerLength && typingRef.current) {
+        socket.emit("stopTyping", selectedChat._id);
+        setTyping(false);
+        typingRef.current = false;
+      }
+    }, timerLength);
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -46,6 +79,11 @@ const MessageInput = () => {
 
     if (!text.trim() && !imagePreview) {
       return;
+    }
+
+    if (socket) {
+      socket.emit("stopTyping", selectedChat._id);
+      setTyping(false);
     }
 
     const formData = new FormData();
@@ -91,7 +129,7 @@ const MessageInput = () => {
             className="w-full border border-gray-300 p-2 rounded-lg resize-none input-sm sm:input-md max-h-[100px]"
             placeholder="Type a message..."
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={typingHandler}
             onInput={(e) => {
               e.target.style.height = "auto";
               const scrollHeight = Math.min(e.target.scrollHeight, 100);

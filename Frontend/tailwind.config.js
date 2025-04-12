@@ -3,7 +3,12 @@ import daisyui from "daisyui";
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        // Add a custom breakpoint for height
+        tall: { raw: "(min-height: 550px)" },
+      },
+    },
   },
   plugins: [daisyui],
   daisyui: {

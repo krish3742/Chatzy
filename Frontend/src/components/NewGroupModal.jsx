@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { useRef, useState, useMemo, useEffect } from "react";
 import { Loader2, Plus, UserPen, UserRoundPlus, X } from "lucide-react";
 
@@ -46,6 +47,46 @@ const NewGroupModal = () => {
     setSelectedUsers(selectedUsers.filter((user) => user._id !== data._id));
   };
 
+  const dropdown =
+    filteredUser.length > 0 &&
+    createPortal(
+      <div
+        className={`absolute rounded-lg bg-base-100 shadow-md overflow-auto max-h-40 z-[9999] border border-gray-300`}
+        style={{
+          top:
+            dropdownDirection === "up"
+              ? inputRef.current?.getBoundingClientRect().top - 170
+              : inputRef.current?.getBoundingClientRect().bottom + 6,
+          left: inputRef.current?.getBoundingClientRect().left,
+          width: inputRef.current?.offsetWidth,
+        }}
+      >
+        {filteredUser.map((user) => (
+          <button
+            key={user._id}
+            onClick={() => {
+              setSelectedUsers([...selectedUsers, user]);
+              setSearch("");
+            }}
+            className="flex items-center gap-3 w-full rounded-none p-3 border-b cursor-pointer border-base-300 hover:bg-base-300 list-row"
+          >
+            <div className="relative flex-shrink-0">
+              <img
+                src={user.profilePic || "/avatar.png"}
+                alt={user.name}
+                className="size-12 object-cover rounded-full"
+              />
+            </div>
+            <div className="flex flex-col text-left min-w-0">
+              <div className="font-medium truncate">{user.fullName}</div>
+              <div className="text-sm text-zinc-400 truncate">{user.email}</div>
+            </div>
+          </button>
+        ))}
+      </div>,
+      document.body
+    );
+
   useEffect(() => {
     if (!isModalOpen) {
       setSearch("");
@@ -86,7 +127,7 @@ const NewGroupModal = () => {
         ref={modalRef}
       />
       <div className="modal" role="dialog">
-        <div className="modal-box overflow-visible">
+        <div className="modal-box max-h-[95vh] overflow-y-auto relative">
           <button
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-1"
             onClick={() => {
@@ -166,42 +207,7 @@ const NewGroupModal = () => {
                     </div>
                   </div>
                 </div>
-                {filteredUser && filteredUser.length > 0 && (
-                  <div
-                    className={`absolute left-0 right-0 w-full rounded-lg bg-base-100 shadow-md overflow-auto max-h-40 z-50 border border-t-0 border-gray-300 ${
-                      dropdownDirection === "up"
-                        ? "bottom-full mb-1"
-                        : "top-full mt-1"
-                    }`}
-                  >
-                    {filteredUser.map((user) => (
-                      <button
-                        key={user._id}
-                        onClick={() => {
-                          setSelectedUsers([...selectedUsers, user]);
-                          setSearch("");
-                        }}
-                        className="flex items-center gap-3 w-full rounded-none p-3 border-b cursor-pointer border-base-300 hover:bg-base-300 list-row"
-                      >
-                        <div className="relative flex-shrink-0">
-                          <img
-                            src={user.profilePic || "/avatar.png"}
-                            alt={user.name}
-                            className="size-12 object-cover rounded-full"
-                          />
-                        </div>
-                        <div className="flex flex-col text-left min-w-0">
-                          <div className="font-medium truncate">
-                            {user.fullName}
-                          </div>
-                          <div className="text-sm text-zinc-400 truncate">
-                            {user.email}
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                {dropdown}
               </div>
             </div>
             <div className="mb-6" />

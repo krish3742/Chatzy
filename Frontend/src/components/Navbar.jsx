@@ -1,13 +1,21 @@
 import { Link } from "react-router-dom";
 import { Bell, User, LogOut, ChevronDown, MessageSquare } from "lucide-react";
 
+import { getUserName } from "../lib/utils";
 import ContactsDrawer from "./ContactsDrawer";
+import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { useThemeStore } from "../store/useThemeStore";
 
 const Navbar = () => {
   const { theme, setTheme } = useThemeStore();
   const { logout, authUser } = useAuthStore();
+  const { notifications, setSelectedChat, filterNotification } = useChatStore();
+
+  const handleNotificationClick = (notification) => {
+    setSelectedChat(notification.chat);
+    filterNotification(notification);
+  };
 
   return (
     <header className="border-b border-base-300 w-full sticky top-0 z-40 backdrop-blur-lg">
@@ -61,12 +69,56 @@ const Navbar = () => {
 
           {authUser && (
             <div className="flex items-center gap-3">
-              {/* {Bell Icon} */}
-              <div
-                className="tooltip tooltip-bottom cursor-pointer hover:bg-base-300 p-2 rounded-full"
-                data-tip="Notifications"
-              >
-                <Bell className="size-6" />
+              <div className="dropdown dropdown-end">
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="tooltip tooltip-bottom relative cursor-pointer flex items-center hover:bg-base-300 p-2 rounded-full"
+                  data-tip="Notifications"
+                >
+                  <Bell className="size-6" />
+                  {notifications.length > 0 && (
+                    <span
+                      className="bg-info"
+                      style={{
+                        position: "absolute",
+                        top: "-5px",
+                        right: "-5px",
+                        color: "black",
+                        borderRadius: "50%",
+                        padding: "2px 6px",
+                        fontSize: "12px",
+                      }}
+                    >
+                      {notifications.length}
+                    </span>
+                  )}
+                </div>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content bg-base-100 rounded-box z-1 w-40 sm:w-60 p-2 shadow-sm border-base-content border"
+                >
+                  {notifications && notifications.length === 0 ? (
+                    <li className="rounded-sm p-1 w-full py-1.5">
+                      <span>No new message</span>
+                    </li>
+                  ) : (
+                    notifications.map((notification) => (
+                      <li
+                        key={notification._id}
+                        className="hover:bg-base-300 rounded-sm p-1 w-full py-1.5 cursor-pointer truncate"
+                        onClick={() => handleNotificationClick(notification)}
+                      >
+                        {notification.chat.isGroupChat
+                          ? `New message in ${notification.chat.chatName}`
+                          : `New message from ${getUserName(
+                              notification.chat.users,
+                              authUser
+                            )}`}
+                      </li>
+                    ))
+                  )}
+                </ul>
               </div>
 
               {/* {Profile Icon} */}

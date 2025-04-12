@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 import { get as apiGet, post, put } from "../services/ApiEndpoint";
+import { useChatStore } from "./useChatStore";
 
 export const useAuthStore = create((set, get) => ({
   socket: null,
@@ -32,6 +33,10 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: response.data.data });
       toast.success("Account created successfully");
       get().connectSocket();
+      const { socket } = get();
+      if (socket) {
+        socket.emit("newUser", response.data.data);
+      }
     } catch (error) {
       if (error.status === 500) {
         toast.error("Something went wrong!");
@@ -94,6 +99,7 @@ export const useAuthStore = create((set, get) => ({
     if (!authUser || get().socket?.connected) {
       return;
     }
+
     const socket = io(import.meta.env.VITE_BASE_URL, {
       query: {
         userId: authUser._id,
@@ -101,8 +107,88 @@ export const useAuthStore = create((set, get) => ({
     });
     socket.connect();
     set({ socket });
+
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
+    });
+
+    const users = useChatStore.getState().users;
+    socket.on("newUserRegistered", (newUser) => {
+      if (
+        users.some((user) => user._id === newUser._id) ||
+        authUser._id === newUser._id
+      ) {
+        return;
+      }
+      useChatStore.setState({
+        users: [...useChatStore.getState().users, newUser],
+      });
+    });
+
+    const chats = useChatStore.getState().chats;
+    socket.on("groupCreated", (newGroup) => {
+      if (chats.some((chat) => chat._id === newGroup._id)) {
+        return;
+      }
+      useChatStore.setState({
+        chats: [newGroup, ...useChatStore.getState().chats],
+      });
+    });
+
+    socket.on("groupRenamed", (groupData) => {
+      const updatedChats = useChatStore
+        .getState()
+        .chats.map((chat) => (chat._id === groupData._id ? groupData : chat));
+
+      useChatStore.setState({ chats: updatedChats });
+    });
+
+    socket.on("addedUserToGroup", (groupData) => {
+      const chats = useChatStore.getState().chats;
+      const chatExists = chats.some((chat) => chat._id === groupData._id);
+
+      let updatedChats;
+
+      if (chatExists) {
+        updatedChats = chats.map((chat) =>
+          chat._id === groupData._id ? groupData : chat
+        );
+      } else {
+        updatedChats = [groupData, ...chats];
+      }
+
+      useChatStore.setState({ chats: updatedChats });
+
+      const selectedChat = useChatStore.getState().selectedChat;
+      if (selectedChat && selectedChat._id === groupData._id) {
+        useChatStore.setState({ selectedChat: groupData });
+      }
+    });
+
+    socket.on("removedUserFromGroup", (groupData) => {
+      const updatedChats = useChatStore
+        .getState()
+        .chats.map((chat) => (chat._id === groupData._id ? groupData : chat));
+
+      useChatStore.setState({ chats: updatedChats });
+
+      const selectedChat = useChatStore.getState().selectedChat;
+      if (selectedChat && selectedChat._id === groupData._id) {
+        useChatStore.setState({ selectedChat: groupData });
+      }
+    });
+
+    socket.on("removedYouFromGroup", (groupData) => {
+      const updatedChats = useChatStore
+        .getState()
+        .chats.filter((chat) => chat._id !== groupData._id);
+
+      useChatStore.setState({ chats: updatedChats });
+
+      const selectedChat = useChatStore.getState().selectedChat;
+      if (selectedChat && selectedChat._id === groupData._id) {
+        useChatStore.setState({ selectedChat: null });
+      }
     });
   },
 

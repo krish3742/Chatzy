@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import { createPortal } from "react-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   X,
@@ -97,6 +98,47 @@ const EditGroupModal = ({ isModalOpen }) => {
     setSelectedUsers([...selectedUsers, { ...addUser, disabled: true }]);
   };
 
+  const dropdown =
+    filteredUser.length > 0 &&
+    createPortal(
+      <div
+        className={`absolute rounded-lg bg-base-100 shadow-md overflow-auto max-h-40 z-[9999] border border-gray-300`}
+        style={{
+          top:
+            dropdownDirection === "up"
+              ? inputRef.current?.getBoundingClientRect().top - 170
+              : inputRef.current?.getBoundingClientRect().bottom + 6,
+          left: inputRef.current?.getBoundingClientRect().left,
+          width: inputRef.current?.offsetWidth,
+        }}
+      >
+        {filteredUser.map((user) => (
+          <button
+            key={user._id}
+            onClick={() => {
+              handleAddClick(user);
+              setSearch("");
+            }}
+            className="flex items-center gap-3 w-full rounded-none p-3 border-b cursor-pointer border-base-300 hover:bg-base-300 list-row"
+          >
+            <div className="relative flex-shrink-0">
+              <img
+                src={user.profilePic || "/avatar.png"}
+                alt={user.name}
+                className="size-12 object-cover rounded-full"
+              />
+            </div>
+
+            <div className="flex flex-col text-left min-w-0">
+              <div className="font-medium truncate">{user.fullName}</div>
+              <div className="text-sm text-zinc-400 truncate">{user.email}</div>
+            </div>
+          </button>
+        ))}
+      </div>,
+      document.body
+    );
+
   useEffect(() => {
     if (!inputRef.current) {
       return;
@@ -124,7 +166,7 @@ const EditGroupModal = ({ isModalOpen }) => {
     setSelectedUsers(
       selectedChat.users.filter((user) => user._id !== authUser._id)
     );
-  }, [selectedChat]);
+  }, [selectedChat.users]);
 
   return (
     <>
@@ -220,43 +262,7 @@ const EditGroupModal = ({ isModalOpen }) => {
               placeholder="Select users"
               onChange={(e) => setSearch(e.target.value)}
             />
-            {filteredUser && filteredUser.length > 0 && (
-              <div
-                className={`absolute left-0 right-0 w-full rounded-lg bg-base-100 shadow-md overflow-auto max-h-40 z-50 border border-t-0 border-gray-300 ${
-                  dropdownDirection === "up"
-                    ? "bottom-full mb-1"
-                    : "top-full mt-1"
-                }`}
-              >
-                {filteredUser.map((user) => (
-                  <button
-                    key={user._id}
-                    onClick={() => {
-                      handleAddClick(user);
-                      setSearch("");
-                    }}
-                    className="flex items-center gap-3 w-full rounded-none p-3 border-b cursor-pointer border-base-300 hover:bg-base-300 list-row"
-                  >
-                    <div className="relative flex-shrink-0">
-                      <img
-                        src={user.profilePic || "/avatar.png"}
-                        alt={user.name}
-                        className="size-12 object-cover rounded-full"
-                      />
-                    </div>
-
-                    <div className="flex flex-col text-left min-w-0">
-                      <div className="font-medium truncate">
-                        {user.fullName}
-                      </div>
-                      <div className="text-sm text-zinc-400 truncate">
-                        {user.email}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+            {dropdown}
           </div>
         </div>
         <div className="flex justify-end">

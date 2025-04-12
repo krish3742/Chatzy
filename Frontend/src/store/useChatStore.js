@@ -8,6 +8,7 @@ export const useChatStore = create((set, get) => ({
   users: [],
   chats: [],
   messages: [],
+  notifications: [],
   selectedChat: null,
   isChatsLoading: false,
   isUsersLoading: false,
@@ -57,6 +58,8 @@ export const useChatStore = create((set, get) => ({
     try {
       const response = await apiGet(`/message/get/${selectedChat._id}`);
       set({ messages: response.data.data });
+      const socket = useAuthStore.getState().socket;
+      socket.emit("joinChat", selectedChat._id);
     } catch (error) {
       if (error.status === 500) {
         toast.error("Something went wrong!");
@@ -73,6 +76,8 @@ export const useChatStore = create((set, get) => ({
     try {
       const response = await post("/message/send", messageData);
       set({ messages: [...messages, response.data.data] });
+      const socket = useAuthStore.getState().socket;
+      socket.emit("newMessage", response.data.data);
     } catch (error) {
       if (error.status === 500) {
         toast.error("Something went wrong!");
@@ -83,28 +88,35 @@ export const useChatStore = create((set, get) => ({
   },
 
   listenMessages: () => {
-    const { selectedUser } = get();
-    if (!selectedUser) {
-      return;
-    }
     const socket = useAuthStore.getState().socket;
-    socket.on("newMessage", (newMessage) => {
-      if (newMessage.senderId !== selectedUser._id) {
-        return;
+
+    socket.off("messageRecieved");
+
+    socket.on("messageRecieved", (newMessage) => {
+      const { selectedChat, messages, notifications, getChats } = get();
+
+      if (selectedChat && selectedChat._id === newMessage.chat._id) {
+        set({ messages: [...messages, newMessage] });
+      } else {
+        const alreadyNotified = notifications.some(
+          (notification) => notification._id === newMessage._id
+        );
+        if (!alreadyNotified) {
+          set({ notifications: [newMessage, ...notifications] });
+          getChats();
+        }
       }
-      set({ messages: [...get().messages, newMessage] });
     });
   },
 
-  ignoreMessages: () => {
-    const socket = useAuthStore.getState().socket;
-    socket.off("newMessage");
-  },
-
   accessChat: async (userId) => {
+    set({ isChatsLoading: true });
     try {
       const response = await apiGet(`/message/${userId}`);
-      get().getChats();
+      const { chats } = get();
+      if (!chats.find((chat) => chat._id === response.data.data._id)) {
+        set({ chats: [response.data.data, ...chats] });
+      }
       set({ selectedChat: response.data.data });
     } catch (error) {
       if (error.status === 500) {
@@ -112,16 +124,20 @@ export const useChatStore = create((set, get) => ({
       } else {
         toast.error(error.response.data.message);
       }
+    } finally {
+      set({ isChatsLoading: false });
     }
   },
-
-  setSelectedChat: (chat) => set({ selectedChat: chat }),
 
   createGroup: async (data) => {
     set({ isCreatingGroup: true });
     try {
       const response = await post("/message/group", data);
-      get().getChats();
+      const socket = useAuthStore.getState().socket;
+      if (socket) {
+        socket.emit("newGroup", response.data.data);
+      }
+      set({ chats: [response.data.data, ...get().chats] });
       toast.success("Group created successfully");
       set({ selectedChat: response.data.data });
     } catch (error) {
@@ -139,6 +155,14 @@ export const useChatStore = create((set, get) => ({
     set({ isGroupRenaming: true });
     try {
       const response = await put("/message/rename", data);
+      const socket = useAuthStore.getState().socket;
+      const authUser = useAuthStore.getState().authUser;
+      if (socket) {
+        socket.emit("groupNameUpdated", {
+          groupData: response.data.data,
+          userId: authUser._id,
+        });
+      }
       get().getChats();
       set({ selectedChat: response.data.data });
       toast.success("Group name updated successfully");
@@ -156,6 +180,11 @@ export const useChatStore = create((set, get) => ({
   addUserToGroup: async (data) => {
     try {
       const response = await put("/message/groupadd", data);
+      const socket = useAuthStore.getState().socket;
+      if (socket) {
+        socket.emit("groupUserAdded", response.data.data);
+      }
+      get().getChats();
       set({ selectedChat: response.data.data });
       toast.success("User added successfully");
     } catch (error) {
@@ -174,10 +203,18 @@ export const useChatStore = create((set, get) => ({
     }
     try {
       const response = await put("/message/groupremove", data);
+      const socket = useAuthStore.getState().socket;
+      if (socket) {
+        socket.emit("groupUserRemoved", {
+          groupData: response.data.data,
+          removedUserId: data.userId,
+          loggedUser: authUser._id,
+        });
+      }
+      get().getChats();
       get().getMessages();
       if (data.userId === authUser._id) {
         set({ selectedChat: null });
-        get().getChats();
       } else {
         set({ selectedChat: response.data.data });
       }
@@ -193,5 +230,23 @@ export const useChatStore = create((set, get) => ({
         set({ isGroupUpdating: false });
       }
     }
+  },
+
+  setSelectedChat: (chat) => {
+    const { notifications } = get();
+
+    const filteredNotifications = notifications.filter(
+      (notification) => notification.chat._id !== chat?._id
+    );
+
+    set({ selectedChat: chat, notifications: filteredNotifications });
+  },
+
+  filterNotification: (notification) => {
+    set({
+      notifications: get().notifications.filter(
+        (prevNotification) => prevNotification !== notification
+      ),
+    });
   },
 }));
