@@ -18,6 +18,8 @@ const router = express.Router();
 
 router.get("/users", verifyToken, getUsers);
 
+router.get("/get/:chatId", verifyToken, getMessages);
+
 router.get("/", verifyToken, fetchChats);
 
 router.get("/:id", verifyToken, accessChat);
@@ -29,8 +31,6 @@ router.put("/rename", verifyToken, renameGroup);
 router.put("/groupremove", verifyToken, removeFromGroup);
 
 router.put("/groupadd", verifyToken, addToGroup);
-
-router.get("/get/:chatId", verifyToken, getMessages);
 
 router.post("/send", verifyToken, upload.single("image"), sendMessage);
 
