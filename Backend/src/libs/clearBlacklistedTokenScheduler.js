@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import BlacklistedToken from "../models/blacklistedToken.model";
+import BlacklistedToken from "../models/blacklistedToken.model.js";
 
 const clearBlacklistedTokenScheduler = cron.schedule("0 0 * * *", async () => {
   const currentDate = Math.floor(Date.now() / 1000);
