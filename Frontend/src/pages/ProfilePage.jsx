@@ -118,7 +118,7 @@ const ProfilePage = () => {
                         {isUpdatingProfile ? (
                           <Loader2 className="size-5 animate-spin" />
                         ) : (
-                          <Check className="size-5 text-base-content/40" />
+                          <Check className="size-5 text-white" />
                         )}
                       </button>
                       <button
@@ -126,7 +126,7 @@ const ProfilePage = () => {
                         className="h-fit p-1 rounded-sm btn btn-primary"
                         onClick={(e) => setEditName(false)}
                       >
-                        <X className="size-5 text-base-content/40" />
+                        <X className="size-5 text-white" />
                       </button>
                     </div>
                   </>
@@ -141,7 +141,7 @@ const ProfilePage = () => {
                         className="h-fit p-1 rounded-sm btn btn-primary"
                         onClick={handleEditClick}
                       >
-                        <Pencil className="size-5 text-base-content/40" />
+                        <Pencil className="size-5 text-white" />
                       </button>
                     </div>
                   </>

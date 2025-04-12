@@ -45,7 +45,9 @@ const LoginPage = () => {
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
               <h1 className="text-2xl font-bold mt-2">Welcome Back</h1>
-              <p className="text-base-content/60">Sign in to your account</p>
+              <p className="text-base-content opacity-80">
+                Sign in to your account
+              </p>
             </div>
           </div>
 
@@ -57,7 +59,7 @@ const LoginPage = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="w-5 h-5 text-base-content/40" />
+                  <Mail className="w-5 h-5 text-base-content opacity-70" />
                 </div>
                 <input
                   type="email"
@@ -76,7 +78,7 @@ const LoginPage = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="size-5 text-base-content/40" />
+                  <Lock className="size-5 text-base-content opacity-70" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -93,9 +95,9 @@ const LoginPage = () => {
                   onClick={(e) => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="size-5 text-base-content/40" />
+                    <EyeOff className="size-5 text-base-content opacity-70" />
                   ) : (
-                    <Eye className="text-base-content/40" />
+                    <Eye className="text-base-content opacity-70" />
                   )}
                 </button>
               </div>
@@ -116,7 +118,7 @@ const LoginPage = () => {
             </button>
           </form>
           <div className="text-center">
-            <p className="text-base-content/60">
+            <p className="text-base-content opacity-85">
               Don't have an account?{" "}
               <Link to="/signup" className="link link-primary">
                 Create account

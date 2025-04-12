@@ -48,7 +48,7 @@ const SignUpPage = () => {
           <div className="text-center mb-6">
             <div className="flex flex-col items-center gap-2 group">
               <h1 className="text-2xl font-bold mt-2">Create Account</h1>
-              <p className="text-base-content/60">
+              <p className="text-base-content opacity-80">
                 Get started with your free account
               </p>
             </div>
@@ -62,7 +62,7 @@ const SignUpPage = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="size-5 text-base-content/40" />
+                  <User className="size-5 text-base-content opacity-70" />
                 </div>
                 <input
                   type="text"
@@ -81,7 +81,7 @@ const SignUpPage = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="size-5 text-base-content/40" />
+                  <Mail className="size-5 text-base-content opacity-70" />
                 </div>
                 <input
                   type="email"
@@ -100,7 +100,7 @@ const SignUpPage = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="size-5 text-base-content/40" />
+                  <Lock className="size-5 text-base-content opacity-70" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
@@ -117,9 +117,9 @@ const SignUpPage = () => {
                   onClick={(e) => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="size-5 text-base-content/40" />
+                    <EyeOff className="size-5 text-base-content opacity-70" />
                   ) : (
-                    <Eye className="text-base-content/40" />
+                    <Eye className="text-base-content opacity-70" />
                   )}
                 </button>
               </div>
@@ -140,7 +140,7 @@ const SignUpPage = () => {
             </button>
           </form>
           <div className="text-center">
-            <p className="text-base-content/60">
+            <p className="text-base-content opacity-85">
               Already have an account?{" "}
               <Link to="/login" className="link link-primary">
                 Sign In

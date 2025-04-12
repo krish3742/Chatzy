@@ -1,5 +1,3 @@
-import ChatHeader from "../ChatHeader";
-
 const MessageSkeleton = () => {
   const skeletonMessages = Array(5).fill(null);
 

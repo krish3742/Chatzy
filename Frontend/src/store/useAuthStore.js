@@ -2,8 +2,8 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-import { get as apiGet, post, put } from "../services/ApiEndpoint";
 import { useChatStore } from "./useChatStore";
+import { get as apiGet, post, put } from "../services/ApiEndpoint";
 
 export const useAuthStore = create((set, get) => ({
   socket: null,

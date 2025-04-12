@@ -54,7 +54,7 @@ const ChatHeader = () => {
               </h3>
 
               {!selectedChat.isGroupChat && (
-                <p className="text-sm text-base-content/70">
+                <p className="text-sm text-base-content opacity-70">
                   {onlineUsers.includes(userProfileId) ? "Online" : "Offline"}
                 </p>
               )}
@@ -63,7 +63,7 @@ const ChatHeader = () => {
 
           {/* Close button */}
           <button onClick={() => setSelectedChat(null)}>
-            <X className="size-5 text-base-content/40" />
+            <X className="size-5 text-base-content opacity-70" />
           </button>
         </div>
       </div>

@@ -147,7 +147,7 @@ const NewGroupModal = () => {
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <UserPen className="size-5 text-base-content/40" />
+                  <UserPen className="size-5 text-base-content opacity-70" />
                 </div>
                 <input
                   type="text"
@@ -170,7 +170,7 @@ const NewGroupModal = () => {
                 >
                   <div className="flex gap-2">
                     <div className="flex items-start pt-1">
-                      <UserRoundPlus className="size-5 text-base-content" />
+                      <UserRoundPlus className="size-5 text-base-content opacity-70" />
                     </div>
 
                     <div className="flex flex-wrap gap-1 flex-1 min-w-0 items-center">

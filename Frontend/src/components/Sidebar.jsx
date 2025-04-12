@@ -72,8 +72,12 @@ const Sidebar = () => {
                     ? chat.chatName
                     : getUserName(chat.users, authUser)}
                 </div>
-                <div className="text-sm text-zinc-400">
-                  {/* {onlineUsers.includes(user._id) ? "Online" : "Offline"} */}
+                <div className="text-sm text-zinc-500 truncate">
+                  {chat?.latestMessage?.text ||
+                    (!chat.isGroupChat &&
+                      (onlineUsers.includes(getUserId(chat.users, authUser))
+                        ? "Online"
+                        : "Offline"))}
                 </div>
               </div>
             </button>
