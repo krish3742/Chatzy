@@ -16,7 +16,7 @@ import { useThemeStore } from "./store/useThemeStore";
 const App = () => {
   const location = useLocation();
   const { theme } = useThemeStore();
-  const scrollableRoutes = ["/profile, /signup"];
+  const scrollableRoutes = ["/profile", "/signup"];
   const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
   const isScrollable = scrollableRoutes.includes(location.pathname);
 

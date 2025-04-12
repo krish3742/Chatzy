@@ -233,6 +233,12 @@ export const useChatStore = create((set, get) => ({
   },
 
   setSelectedChat: (chat) => {
+    if (chat && chat._id) {
+      localStorage.setItem("chat-id", chat._id);
+    } else {
+      localStorage.removeItem("chat-id");
+    }
+
     const { notifications } = get();
 
     const filteredNotifications = notifications.filter(

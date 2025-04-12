@@ -16,6 +16,21 @@ const Sidebar = () => {
     getChats();
   }, [getChats]);
 
+  useEffect(() => {
+    const chatId = localStorage.getItem("chat-id");
+    if (
+      chatId &&
+      chats.length > 0 &&
+      chatId !== "undefined" &&
+      chatId !== "null"
+    ) {
+      const chat = chats.find((chat) => chat._id === chatId);
+      if (chat) {
+        setSelectedChat(chat);
+      }
+    }
+  }, [chats]);
+
   return (
     <aside className="h-full border-r border-base-300 flex flex-col transition-all duration-200">
       <div className="border-b border-base-300 w-full flex items-center justify-between p-4">
