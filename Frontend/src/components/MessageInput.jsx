@@ -126,7 +126,7 @@ const MessageInput = () => {
         <div className="flex-1 flex gap-2">
           <textarea
             rows={1}
-            className="w-full border border-gray-300 p-2 rounded-lg resize-none input-sm sm:input-md max-h-[100px]"
+            className="w-full border border-gray-300 p-2 rounded-lg bg-transparent resize-none input-sm sm:input-md max-h-[100px]"
             placeholder="Type a message..."
             value={text}
             onChange={typingHandler}
