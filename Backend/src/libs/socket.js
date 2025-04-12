@@ -2,7 +2,6 @@ import http from "http";
 import dotenv from "dotenv";
 import express from "express";
 import { Server } from "socket.io";
-import { group } from "console";
 
 dotenv.config();
 const app = express();
