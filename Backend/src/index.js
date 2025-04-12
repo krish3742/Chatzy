@@ -8,6 +8,7 @@ import createHttpError from "http-errors";
 import { app, server } from "./libs/socket.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import clearBlacklistedTokenScheduler from "./libs/clearBlacklistedTokenScheduler.js";
 
 dotenv.config();
 app.use(express.json());
@@ -33,6 +34,8 @@ app.use((error, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 const connectionString = process.env.MONGODB_URI;
+
+clearBlacklistedTokenScheduler;
 
 (async () => {
   try {

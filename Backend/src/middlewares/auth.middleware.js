@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import User from "../models/user.model.js";
+import BlacklistedToken from "../models/blacklistedToken.model.js";
 
 export const verifyToken = async (req, res, next) => {
   try {
@@ -9,6 +10,15 @@ export const verifyToken = async (req, res, next) => {
       const resp = {
         status: "error",
         message: "Unauthorized: No token found",
+      };
+      res.status(401).json(resp);
+      return;
+    }
+    const blacklistItem = await BlacklistedToken.findOne({ token });
+    if (blacklistItem) {
+      const resp = {
+        status: "error",
+        message: "Unauthorized: Invalid found",
       };
       res.status(401).json(resp);
       return;
@@ -33,6 +43,8 @@ export const verifyToken = async (req, res, next) => {
       return;
     }
     req.user = user;
+    req.token = token;
+    req.tokenExp = decoded.exp;
     next();
   } catch (error) {
     next(error);

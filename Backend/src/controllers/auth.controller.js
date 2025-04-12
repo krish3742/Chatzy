@@ -2,6 +2,7 @@ import bcryptjs from "bcryptjs";
 
 import User from "../models/user.model.js";
 import { generateToken } from "../libs/utils.js";
+import BlacklistedToken from "../models/blacklistedToken.model.js";
 
 export const signup = async (req, res, next) => {
   const { email, fullName, password } = req.body;
@@ -113,8 +114,12 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const logout = (req, res, next) => {
+export const logout = async (req, res, next) => {
   try {
+    const token = req.token;
+    const expiryAt = req.tokenExp;
+    const blacklistedToken = new BlacklistedToken({ token, expiryAt });
+    await blacklistedToken.save();
     res.clearCookie("JWT_Token");
     const resp = {
       status: "success",
