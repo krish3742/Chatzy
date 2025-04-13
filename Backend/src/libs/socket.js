@@ -16,6 +16,10 @@ const io = new Server(server, {
 
 const userSocketMap = {};
 
+export function getReceiverSocketId(userId) {
+  return userSocketMap[userId];
+}
+
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
   if (userId) {
@@ -30,6 +34,10 @@ io.on("connection", (socket) => {
 
   socket.on("newUser", (user) => {
     io.emit("newUserRegistered", user);
+  });
+
+  socket.on("userUpdated", (userProfile) => {
+    io.emit("userProfileUpdated", userProfile);
   });
 
   socket.on("joinChat", (room) => {

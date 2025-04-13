@@ -1,6 +1,7 @@
 import Chat from "../models/chat.model.js";
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../libs/socket.js";
 
 export const getUsers = async (req, res, next) => {
   try {
@@ -83,6 +84,11 @@ export const accessChat = async (req, res, next) => {
       "users",
       "-password"
     );
+
+    const receiverSocketId = getReceiverSocketId(userToChatId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newChatCreated", fullChat);
+    }
 
     const resp = {
       status: "success",

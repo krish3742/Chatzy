@@ -81,6 +81,10 @@ export const useAuthStore = create((set, get) => ({
     set({ isUpdatingProfile: true });
     try {
       const response = await put("/auth/update-profile", data);
+      const { socket } = get();
+      if (socket) {
+        socket.emit("userUpdated", response.data.data);
+      }
       set({ authUser: response.data.data });
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -122,6 +126,29 @@ export const useAuthStore = create((set, get) => ({
       }
       useChatStore.setState({
         users: [...useChatStore.getState().users, newUser],
+      });
+    });
+
+    socket.on("userProfileUpdated", (userProfile) => {
+      const updatedUsers = useChatStore
+        .getState()
+        .users.map((user) =>
+          user._id === userProfile._id ? userProfile : user
+        );
+      useChatStore.setState({ users: updatedUsers });
+
+      const updatedChats = useChatStore.getState().chats.map((chat) => {
+        const updatedUsers = chat.users.map((user) =>
+          user._id === userProfile._id ? userProfile : user
+        );
+        return { ...chat, users: updatedUsers };
+      });
+      useChatStore.setState({ chats: updatedChats });
+    });
+
+    socket.on("newChatCreated", (newChat) => {
+      useChatStore.setState({
+        chats: [newChat, ...useChatStore.getState().chats],
       });
     });
 
