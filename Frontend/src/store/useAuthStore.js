@@ -12,6 +12,7 @@ export const useAuthStore = create((set, get) => ({
   isSigningUp: false,
   isLoggingIn: false,
   isCheckingAuth: true,
+  loggingAsGuest: false,
   isUpdatingProfile: false,
 
   checkAuth: async () => {
@@ -49,7 +50,11 @@ export const useAuthStore = create((set, get) => ({
   },
 
   login: async (data) => {
-    set({ isLoggingIn: true });
+    if (data.email !== "guest@example.com") {
+      set({ isLoggingIn: true });
+    } else {
+      set({ loggingAsGuest: true });
+    }
     try {
       const response = await post("/auth/login", data);
       set({ authUser: response.data.data });
@@ -63,6 +68,7 @@ export const useAuthStore = create((set, get) => ({
       }
     } finally {
       set({ isLoggingIn: false });
+      set({ loggingAsGuest: false });
     }
   },
 

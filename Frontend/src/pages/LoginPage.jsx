@@ -11,8 +11,8 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
-  const { isLoggingIn, login } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
+  const { isLoggingIn, loggingAsGuest, login } = useAuthStore();
 
   const validateForm = () => {
     if (!formData.email.trim()) {
@@ -28,11 +28,15 @@ const LoginPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e, role = "user") => {
     e.preventDefault();
-    const response = validateForm();
-    if (response === true) {
-      login(formData);
+    if (role === "user") {
+      const response = validateForm();
+      if (response === true) {
+        login(formData);
+      }
+    } else {
+      login({ email: "guest@example.com", password: "password" });
     }
   };
 
@@ -40,7 +44,7 @@ const LoginPage = () => {
     <div className="h-full grid md:grid-cols-2">
       {/* Left Side */}
       <div className="flex flex-col justify-center items-center p-2">
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md space-y-4">
           {/* LOGO */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
@@ -105,7 +109,7 @@ const LoginPage = () => {
             <button
               type="submit"
               className="btn btn-primary w-full"
-              disabled={isLoggingIn}
+              disabled={isLoggingIn || loggingAsGuest}
             >
               {isLoggingIn ? (
                 <>
@@ -117,6 +121,21 @@ const LoginPage = () => {
               )}
             </button>
           </form>
+          <button
+            type="submit"
+            className="btn btn-error w-full"
+            onClick={(e) => handleSubmit(e, "guest")}
+            disabled={loggingAsGuest || isLoggingIn}
+          >
+            {loggingAsGuest ? (
+              <>
+                <Loader2 className="size-5 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              "Login as Guest User"
+            )}
+          </button>
           <div className="text-center">
             <p className="text-base-content opacity-85">
               Don't have an account?{" "}
