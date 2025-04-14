@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { Eye, Mail, Lock, EyeOff, Loader2 } from "lucide-react";
 
 import { useAuthStore } from "../store/useAuthStore";
-import AuthImagePattern from "../components/AuthImagePattern";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -41,7 +40,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="h-full grid md:grid-cols-2">
+    <div className="h-full grid">
       {/* Left Side */}
       <div className="flex flex-col justify-center items-center p-2">
         <div className="w-full max-w-md space-y-4">
@@ -146,11 +145,6 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
-      {/* Right Side */}
-      <AuthImagePattern
-        title="Join our community"
-        subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
-      />
     </div>
   );
 };

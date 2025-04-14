@@ -13,6 +13,7 @@ export const useAuthStore = create((set, get) => ({
   isLoggingIn: false,
   isCheckingAuth: true,
   loggingAsGuest: false,
+  isProfileRenaming: false,
   isUpdatingProfile: false,
 
   checkAuth: async () => {
@@ -84,7 +85,11 @@ export const useAuthStore = create((set, get) => ({
   },
 
   updateProfile: async (data) => {
-    set({ isUpdatingProfile: true });
+    if (data?.fullName) {
+      set({ isProfileRenaming: true });
+    } else {
+      set({ isUpdatingProfile: true });
+    }
     try {
       const response = await put("/auth/update-profile", data);
       const { socket } = get();
@@ -101,6 +106,7 @@ export const useAuthStore = create((set, get) => ({
       }
     } finally {
       set({ isUpdatingProfile: false });
+      set({ isProfileRenaming: false });
     }
   },
 

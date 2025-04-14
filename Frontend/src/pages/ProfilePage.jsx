@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { Camera, User, Mail, Pencil, X, Check, Loader2 } from "lucide-react";
 
 import { useAuthStore } from "../store/useAuthStore";
@@ -8,7 +9,8 @@ const ProfilePage = () => {
   const { theme } = useThemeStore();
   const [editName, setEditName] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-  const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
+  const { authUser, isUpdatingProfile, updateProfile, isProfileRenaming } =
+    useAuthStore();
   const [fullName, setFullName] = useState(authUser.fullName);
 
   const handleEditClick = () => {
@@ -83,7 +85,7 @@ const ProfilePage = () => {
               </label>
             </div>
             <p className="text-sm text-zinc-400">
-              {isUpdatingProfile && !editName
+              {isUpdatingProfile
                 ? "Uploading..."
                 : "Click the camera icon to update your photo"}
             </p>
@@ -112,10 +114,10 @@ const ProfilePage = () => {
                         disabled={
                           fullName === authUser.fullName ||
                           !fullName ||
-                          (isUpdatingProfile && editName)
+                          isProfileRenaming
                         }
                       >
-                        {isUpdatingProfile ? (
+                        {isProfileRenaming ? (
                           <Loader2 className="size-5 animate-spin" />
                         ) : (
                           <Check className="size-5 text-white" />

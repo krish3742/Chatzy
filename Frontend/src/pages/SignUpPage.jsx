@@ -1,10 +1,19 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { Eye, User, Lock, Mail, EyeOff, Loader2 } from "lucide-react";
+import {
+  Eye,
+  User,
+  Lock,
+  Mail,
+  EyeOff,
+  Loader2,
+  Camera,
+  Image,
+  X,
+} from "lucide-react";
 
 import { useAuthStore } from "../store/useAuthStore";
-import AuthImagePattern from "../components/AuthImagePattern";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -12,8 +21,12 @@ const SignUpPage = () => {
     email: "",
     password: "",
   });
+  const formAPIData = new FormData();
   const { isSigningUp, signUp } = useAuthStore();
+  const [profilePic, setProfilePic] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isImageHovered, setIsImageHovered] = useState(false);
 
   const validateForm = () => {
     if (!formData.fullName.trim()) {
@@ -31,11 +44,40 @@ const SignUpPage = () => {
     }
   };
 
+  const handleProfilePicUpdate = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("File size should not exceed 2MB.");
+      return;
+    }
+    const fileType = file.type;
+    if (!fileType.startsWith("image/")) {
+      toast.error("Only image files are allowed!");
+      return;
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      setProfilePic(file);
+      setSelectedImage(reader.result);
+      e.target.value = null;
+    };
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const response = validateForm();
+    formAPIData.append("fullName", formData.fullName);
+    formAPIData.append("email", formData.email);
+    formAPIData.append("password", formData.password);
+    if (profilePic) {
+      formAPIData.append("profilePic", profilePic);
+    }
     if (response === true) {
-      signUp(formData);
+      signUp(formAPIData);
     }
   };
 
@@ -55,6 +97,46 @@ const SignUpPage = () => {
           </div>
 
           {/* Form */}
+          <div className="block md:hidden">
+            <label className="label">
+              <span className="label-text font-medium">Profile Picture</span>
+            </label>
+            <div className="flex justify-center">
+              <div className="relative w-fit">
+                <img
+                  src={selectedImage || "/avatar.png"}
+                  alt="Profile"
+                  className="size-32 rounded-full object-cover border-4"
+                />
+                <label
+                  htmlFor="profile-upload"
+                  className="absolute bottom-0 right-0 bg-base-content hover:scale-105 p-2 rounded-full cursor-pointer transition-all duration-200"
+                >
+                  <Camera className="w-5 h-5 text-base-200" />
+                  <input
+                    type="file"
+                    id="profile-upload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleProfilePicUpdate}
+                    disabled={isSigningUp}
+                  />
+                </label>
+                {selectedImage && (
+                  <button
+                    htmlFor="profile-remove"
+                    className="absolute top-1 right-4 bg-base-content hover:scale-105 p-1 rounded-full"
+                    onClick={() => {
+                      setProfilePic(null);
+                      setSelectedImage(null);
+                    }}
+                  >
+                    <X className="w-3 h-3 text-base-200" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
               <label className="label">
@@ -149,11 +231,47 @@ const SignUpPage = () => {
           </div>
         </div>
       </div>
+
       {/* Right Side */}
-      <AuthImagePattern
-        title="Join our community"
-        subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
-      />
+      <div className="hidden md:flex flex-col gap-4 items-center justify-center bg-base-200">
+        <div className="text-xl font-semibold flex items-center gap-2">
+          Profile Picture
+        </div>
+        <div className="relative" onMouseLeave={() => setIsImageHovered(false)}>
+          <img
+            src={selectedImage || "/avatar.png"}
+            alt="Profile"
+            className="size-48 rounded-full object-cover border-4"
+            onMouseEnter={() => setIsImageHovered(true)}
+          />
+          <label
+            htmlFor="profile-upload"
+            className="absolute bottom-2 right-2 bg-base-content hover:scale-105 p-2 rounded-full cursor-pointer transition-all duration-200"
+          >
+            <Camera className="w-5 h-5 text-base-200" />
+            <input
+              type="file"
+              id="profile-upload"
+              className="hidden"
+              accept="image/*"
+              onChange={handleProfilePicUpdate}
+              disabled={isSigningUp}
+            />
+          </label>
+          {selectedImage && isImageHovered && (
+            <button
+              htmlFor="profile-remove"
+              className="absolute top-3 right-7 bg-base-content hover:scale-105 p-1 rounded-full"
+              onClick={() => {
+                setProfilePic(null);
+                setSelectedImage(null);
+              }}
+            >
+              <X className="w-3 h-3 text-base-200" />
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
