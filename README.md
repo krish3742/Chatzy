@@ -2,7 +2,7 @@
 
 **Chatzy** is a full-stack **MERN** chat application built with **JavaScript**, offering real-time messaging capabilities powered by **Socket.IO**. It features secure user authentication, private messaging, group chats, and a sleek, responsive user interface, making it a complete solution for modern web-based communication.
 
-**Live Website**: [Chatzy](https://chatzy-y3mu.onrender.com)
+**Live Website**: [Chatzy](https://chatzy-five.vercel.app)
 
 ---
 
