@@ -1,4 +1,3 @@
-import path from "path";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
@@ -17,23 +16,15 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: `${process.env.CORS_ORIGIN_URL}`, credentials: true }));
 
+app.get("/", (req, res, next) => {
+  res.send("Welcome");
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 
-const __dirname1 = path.resolve();
 const PORT = process.env.PORT || 3000;
 const connectionString = process.env.MONGODB_URI;
-
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname1, "../Frontend/dist")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname1, "../Frontend", "dist", "index.html"));
-  });
-} else {
-  app.get("/", (req, res, next) => {
-    res.send("Welcome");
-  });
-}
 
 app.use((req, res, next) => {
   next(createHttpError.NotFound());
